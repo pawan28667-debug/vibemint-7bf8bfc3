@@ -31,7 +31,7 @@ export type FeedPost = {
 const POST_SELECT =
   "id, author_id, kind, caption, category, media_path, thumb_path, duration_seconds, width, height, like_count, comment_count, created_at, profiles!posts_author_id_fkey(id, handle, display_name, avatar_url, hue)";
 
-export function useFeed(options: { kind?: "photo" | "video"; authorId?: string; search?: string; category?: string } = {}) {
+export function useFeed(options: { kind?: "photo" | "video"; authorId?: string | undefined; search?: string; category?: string } = {}) {
   const { kind, authorId, search, category } = options;
   return useQuery({
     queryKey: ["feed", kind ?? "all", authorId ?? "all", search ?? "", category ?? "All"],
