@@ -10,16 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as ChatChatIdRouteImport } from './routes/chat.$chatId'
+import { Route as PostPostIdRouteImport } from './routes/post.$postId'
+import { Route as UHandleRouteImport } from './routes/u.$handle'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExploreRoute = ExploreRouteImport.update({
@@ -52,73 +60,104 @@ const ChatChatIdRoute = ChatChatIdRouteImport.update({
   path: '/chat/$chatId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PostPostIdRoute = PostPostIdRouteImport.update({
+  id: '/post/$postId',
+  path: '/post/$postId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UHandleRoute = UHandleRouteImport.update({
+  id: '/u/$handle',
+  path: '/u/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/messages': typeof MessagesRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
   '/chat/$chatId': typeof ChatChatIdRoute
+  '/post/$postId': typeof PostPostIdRoute
+  '/u/$handle': typeof UHandleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/messages': typeof MessagesRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
   '/chat/$chatId': typeof ChatChatIdRoute
+  '/post/$postId': typeof PostPostIdRoute
+  '/u/$handle': typeof UHandleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/messages': typeof MessagesRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
   '/chat/$chatId': typeof ChatChatIdRoute
+  '/post/$postId': typeof PostPostIdRoute
+  '/u/$handle': typeof UHandleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/explore'
     | '/messages'
     | '/privacy'
     | '/profile'
     | '/shorts'
     | '/chat/$chatId'
+    | '/post/$postId'
+    | '/u/$handle'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/explore'
     | '/messages'
     | '/privacy'
     | '/profile'
     | '/shorts'
     | '/chat/$chatId'
+    | '/post/$postId'
+    | '/u/$handle'
   id:
     | '__root__'
     | '/'
+    | '/auth'
     | '/explore'
     | '/messages'
     | '/privacy'
     | '/profile'
     | '/shorts'
     | '/chat/$chatId'
+    | '/post/$postId'
+    | '/u/$handle'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   ExploreRoute: typeof ExploreRoute
   MessagesRoute: typeof MessagesRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ShortsRoute: typeof ShortsRoute
   ChatChatIdRoute: typeof ChatChatIdRoute
+  PostPostIdRoute: typeof PostPostIdRoute
+  UHandleRoute: typeof UHandleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -128,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explore': {
@@ -172,17 +218,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatChatIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/post/$postId': {
+      id: '/post/$postId'
+      path: '/post/$postId'
+      fullPath: '/post/$postId'
+      preLoaderRoute: typeof PostPostIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/u/$handle': {
+      id: '/u/$handle'
+      path: '/u/$handle'
+      fullPath: '/u/$handle'
+      preLoaderRoute: typeof UHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   ExploreRoute: ExploreRoute,
   MessagesRoute: MessagesRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ShortsRoute: ShortsRoute,
   ChatChatIdRoute: ChatChatIdRoute,
+  PostPostIdRoute: PostPostIdRoute,
+  UHandleRoute: UHandleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

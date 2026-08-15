@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { TopBar, BottomNav } from "@/components/vibe/AppChrome";
+import { AuthProvider } from "@/lib/auth";
 
 
 function NotFoundComponent() {
@@ -131,14 +132,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-dvh bg-background">
-        <TopBar />
-        <main className="mx-auto w-full max-w-3xl pb-24">
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-        </main>
-        <BottomNav />
-      </div>
+      <AuthProvider>
+        <div className="min-h-dvh bg-background">
+          <TopBar />
+          <main className="mx-auto w-full max-w-3xl pb-24">
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+          </main>
+          <BottomNav />
+        </div>
+      </AuthProvider>
     </QueryClientProvider>
   );
 
