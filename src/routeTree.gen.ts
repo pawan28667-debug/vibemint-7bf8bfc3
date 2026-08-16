@@ -16,6 +16,7 @@ import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ShortsRouteImport } from './routes/shorts'
+import { Route as UploadRouteImport } from './routes/upload'
 import { Route as ChatChatIdRouteImport } from './routes/chat.$chatId'
 import { Route as PostPostIdRouteImport } from './routes/post.$postId'
 import { Route as UHandleRouteImport } from './routes/u.$handle'
@@ -55,6 +56,11 @@ const ShortsRoute = ShortsRouteImport.update({
   path: '/shorts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UploadRoute = UploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChatChatIdRoute = ChatChatIdRouteImport.update({
   id: '/chat/$chatId',
   path: '/chat/$chatId',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
+  '/upload': typeof UploadRoute
   '/chat/$chatId': typeof ChatChatIdRoute
   '/post/$postId': typeof PostPostIdRoute
   '/u/$handle': typeof UHandleRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
+  '/upload': typeof UploadRoute
   '/chat/$chatId': typeof ChatChatIdRoute
   '/post/$postId': typeof PostPostIdRoute
   '/u/$handle': typeof UHandleRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
+  '/upload': typeof UploadRoute
   '/chat/$chatId': typeof ChatChatIdRoute
   '/post/$postId': typeof PostPostIdRoute
   '/u/$handle': typeof UHandleRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/shorts'
+    | '/upload'
     | '/chat/$chatId'
     | '/post/$postId'
     | '/u/$handle'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/shorts'
+    | '/upload'
     | '/chat/$chatId'
     | '/post/$postId'
     | '/u/$handle'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/shorts'
+    | '/upload'
     | '/chat/$chatId'
     | '/post/$postId'
     | '/u/$handle'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ShortsRoute: typeof ShortsRoute
+  UploadRoute: typeof UploadRoute
   ChatChatIdRoute: typeof ChatChatIdRoute
   PostPostIdRoute: typeof PostPostIdRoute
   UHandleRoute: typeof UHandleRoute
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShortsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/upload': {
+      id: '/upload'
+      path: '/upload'
+      fullPath: '/upload'
+      preLoaderRoute: typeof UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chat/$chatId': {
       id: '/chat/$chatId'
       path: '/chat/$chatId'
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ShortsRoute: ShortsRoute,
+  UploadRoute: UploadRoute,
   ChatChatIdRoute: ChatChatIdRoute,
   PostPostIdRoute: PostPostIdRoute,
   UHandleRoute: UHandleRoute,
