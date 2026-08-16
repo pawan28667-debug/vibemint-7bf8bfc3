@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Play, ThumbsUp, MessageSquare, Share2, Bookmark, Lock } from "lucide-react";
-import { HueTile, Monogram, SectionHeading, VisibilityChip } from "@/components/vibe/primitives";
-import { videos, photos, shorts, creatorById } from "@/lib/mock-data";
+import { Lock, Play, Upload } from "lucide-react";
+import { HueTile, SectionHeading } from "@/components/vibe/primitives";
+import { PostCard } from "@/components/vibe/PostCard";
+import { useFeed, useMyLikes, useToggleLike } from "@/lib/data";
+import { useSignedUrls, formatDuration } from "@/lib/media";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -23,7 +25,19 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const feed = videos.filter((v) => v.visibility === "public");
+  const feed = useFeed();
+  const shorts = useFeed({ kind: "video" });
+  const posts = feed.data ?? [];
+  const shortList = (shorts.data ?? []).filter((p) => (p.duration_seconds ?? 0) <= 90).slice(0, 8);
+
+  const urls =
+    useSignedUrls([
+      ...posts.flatMap((p) => [p.media_path, p.thumb_path]),
+      ...shortList.map((p) => p.thumb_path),
+    ]).data ?? {};
+
+  const likes = useMyLikes().data ?? new Set<string>();
+  const toggle = useToggleLike();
 
   return (
     <div className="space-y-8 px-4 py-5">
@@ -36,10 +50,10 @@ function Home() {
           </h1>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link
-              to="/explore"
-              className="rounded-full gradient-marigold px-4 py-2 text-sm font-medium text-primary-foreground"
+              to="/upload"
+              className="inline-flex items-center gap-2 rounded-full gradient-marigold px-4 py-2 text-sm font-medium text-primary-foreground"
             >
-              Explore feed
+              <Upload className="size-3.5" /> Upload
             </Link>
             <Link
               to="/messages"
@@ -51,112 +65,86 @@ function Home() {
         </div>
       </section>
 
-      <section>
-        <SectionHeading
-          title="Shorts"
-          action={
-            <Link to="/shorts" className="text-xs text-primary">
-              See all
-            </Link>
-          }
-        />
-        <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
-          {shorts.map((s) => (
-            <Link key={s.id} to="/shorts" className="w-32 shrink-0">
-              <HueTile hue={s.hue} className="aspect-9/16" label={s.title}>
-                <span className="absolute bottom-2 left-2 right-2 line-clamp-2 text-[11px] leading-tight text-foreground/90">
-                  {s.title}
-                </span>
-              </HueTile>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {shortList.length > 0 && (
+        <section>
+          <SectionHeading
+            title="Shorts"
+            action={
+              <Link to="/shorts" className="text-xs text-primary">
+                See all
+              </Link>
+            }
+          />
+          <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
+            {shortList.map((s) => {
+              const thumb = s.thumb_path ? urls[s.thumb_path] : undefined;
+              return (
+                <Link key={s.id} to="/shorts" className="w-32 shrink-0">
+                  {thumb ? (
+                    <div className="relative aspect-9/16 overflow-hidden rounded-xl bg-surface-2">
+                      <img src={thumb} alt={s.caption || "Short"} loading="lazy" className="size-full object-cover" />
+                      <span className="absolute bottom-2 left-2 right-2 line-clamp-2 text-[11px] leading-tight">
+                        {s.caption}
+                      </span>
+                    </div>
+                  ) : (
+                    <HueTile hue={s.profiles?.hue ?? 42} className="aspect-9/16" label={s.caption}>
+                      <span className="absolute inset-0 grid place-items-center">
+                        <Play className="size-5" />
+                      </span>
+                      <span className="absolute bottom-2 left-2 right-2 line-clamp-2 text-[11px] leading-tight">
+                        {s.caption}
+                      </span>
+                    </HueTile>
+                  )}
+                  {s.duration_seconds ? (
+                    <p className="mt-1 text-[11px] text-muted-foreground">{formatDuration(s.duration_seconds)}</p>
+                  ) : null}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section>
         <SectionHeading title="Recommended for you" />
-        <div className="space-y-6">
-          {feed.map((v) => {
-            const c = creatorById(v.creatorId);
-            return (
-              <article key={v.id}>
-                <HueTile hue={v.hue} className="aspect-video" label={v.title}>
-                  <span className="absolute inset-0 grid place-items-center">
-                    <span className="grid size-12 place-items-center rounded-full bg-background/50 backdrop-blur">
-                      <Play className="size-5 text-foreground" />
-                    </span>
-                  </span>
-                  <span className="absolute bottom-2 right-2 rounded bg-background/80 px-1.5 py-0.5 text-[11px]">
-                    {v.duration}
-                  </span>
-                </HueTile>
-                <div className="mt-3 flex gap-3">
-                  <Monogram name={c.name} hue={c.hue} />
-                  <div className="min-w-0">
-                    <h3 className="line-clamp-2 text-sm font-medium leading-snug">{v.title}</h3>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {c.name} · {v.views} · {v.age}
-                    </p>
-                    <div className="mt-2 flex items-center gap-4 text-muted-foreground">
-                      <button className="inline-flex items-center gap-1.5 text-xs hover:text-foreground">
-                        <ThumbsUp className="size-4" /> 12K
-                      </button>
-                      <button className="inline-flex items-center gap-1.5 text-xs hover:text-foreground">
-                        <MessageSquare className="size-4" /> 486
-                      </button>
-                      <Link
-                        to="/messages"
-                        className="inline-flex items-center gap-1.5 text-xs text-secure"
-                      >
-                        <Share2 className="size-4" /> Share privately
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section>
-        <SectionHeading title="From your photo feed" />
-        <div className="space-y-5">
-          {photos.slice(0, 3).map((p) => {
-            const c = creatorById(p.creatorId);
-            return (
-              <article key={p.id} className="surface-card overflow-hidden">
-                <div className="flex items-center gap-3 p-3">
-                  <Monogram name={c.name} hue={c.hue} size={34} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{c.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">{c.handle}</p>
-                  </div>
-                  <VisibilityChip visibility={p.visibility} />
-                </div>
-                <HueTile hue={p.hue} className="aspect-4/5 rounded-none" label={p.caption}>
-                  {p.frames > 1 && (
-                    <span className="absolute right-2 top-2 rounded-full bg-background/70 px-2 py-0.5 text-[11px]">
-                      1/{p.frames}
-                    </span>
-                  )}
-                </HueTile>
-                <div className="flex items-center gap-4 p-3 text-muted-foreground">
-                  <button className="inline-flex items-center gap-1.5 text-xs hover:text-foreground">
-                    <ThumbsUp className="size-4" /> {p.likes.toLocaleString("en-IN")}
-                  </button>
-                  <button className="inline-flex items-center gap-1.5 text-xs hover:text-foreground">
-                    <MessageSquare className="size-4" /> {p.comments}
-                  </button>
-                  <button className="ml-auto hover:text-foreground" aria-label="Save">
-                    <Bookmark className="size-4" />
-                  </button>
-                </div>
-                <p className="px-3 pb-3 text-sm">{p.caption}</p>
-              </article>
-            );
-          })}
-        </div>
+        {feed.isLoading ? (
+          <div className="space-y-4">
+            {[0, 1].map((i) => (
+              <div key={i} className="h-64 animate-pulse rounded-xl bg-surface-2" />
+            ))}
+          </div>
+        ) : feed.error ? (
+          <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+            The feed didn't load. Pull down or refresh to try again.
+          </p>
+        ) : posts.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border p-8 text-center">
+            <p className="text-sm font-medium">Nothing here yet</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Be the first to post a photo or video to the public feed.
+            </p>
+            <Link
+              to="/upload"
+              className="mt-4 inline-block rounded-full gradient-marigold px-4 py-2 text-xs font-medium text-primary-foreground"
+            >
+              Upload something
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {posts.map((p) => (
+              <PostCard
+                key={p.id}
+                post={p}
+                urls={urls}
+                liked={likes.has(p.id)}
+                onLike={() => toggle.mutate({ postId: p.id, liked: likes.has(p.id) })}
+              />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
