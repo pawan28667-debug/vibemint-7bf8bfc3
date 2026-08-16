@@ -29,7 +29,7 @@ export type FeedPost = {
 };
 
 const POST_SELECT =
-  "id, author_id, kind, caption, category, media_path, thumb_path, duration_seconds, width, height, like_count, comment_count, created_at, profiles!posts_author_id_fkey(id, handle, display_name, avatar_url, hue)";
+  "id, author_id, kind, caption, category, media_path, thumb_path, duration_seconds, width, height, like_count, comment_count, created_at, profiles!posts_author_profile_fkey(id, handle, display_name, avatar_url, hue)";
 
 export function useFeed(options: { kind?: "photo" | "video"; authorId?: string | undefined; search?: string; category?: string } = {}) {
   const { kind, authorId, search, category } = options;
@@ -100,7 +100,7 @@ export function useComments(postId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("comments")
-        .select("id, body, created_at, user_id, profiles!comments_user_id_fkey(handle, display_name, hue)")
+        .select("id, body, created_at, user_id, profiles!comments_user_profile_fkey(handle, display_name, hue)")
         .eq("post_id", postId)
         .order("created_at", { ascending: false })
         .limit(100);
@@ -215,7 +215,7 @@ export function useNotifications() {
       const { data, error } = await supabase
         .from("notifications")
         .select(
-          "id, type, actor_id, post_id, conversation_id, read_at, created_at, profiles!notifications_actor_id_fkey(handle, display_name, hue)",
+          "id, type, actor_id, post_id, conversation_id, read_at, created_at, profiles!notifications_actor_profile_fkey(handle, display_name, hue)",
         )
         .order("created_at", { ascending: false })
         .limit(60);
