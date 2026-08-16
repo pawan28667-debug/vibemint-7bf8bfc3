@@ -111,6 +111,8 @@ function UploadPage() {
         </p>
         <Link
           to="/auth"
+          search={{ next: "/upload" }}
+
           className="mt-5 inline-block rounded-full gradient-marigold px-5 py-2 text-sm font-medium text-primary-foreground"
         >
           Sign in
