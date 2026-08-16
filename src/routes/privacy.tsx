@@ -1,6 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ShieldCheck, Smartphone, Laptop, Tablet, KeyRound, Ban, Download, Trash2 } from "lucide-react";
-import { SectionHeading } from "@/components/vibe/primitives";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ShieldCheck, Smartphone, Lock, Globe } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { useMyDevices } from "@/lib/messaging";
+import { useNotificationPrefs } from "@/lib/data";
+import { timeAgo } from "@/lib/media";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
@@ -8,120 +11,138 @@ export const Route = createFileRoute("/privacy")({
       { title: "Privacy Centre — VibeConnect" },
       {
         name: "description",
-        content:
-          "See your encryption status, devices, permissions and data controls in one place.",
+        content: "Manage your encryption devices, safety numbers and notification privacy on VibeConnect.",
       },
       { property: "og:title", content: "Privacy Centre — VibeConnect" },
-      {
-        property: "og:description",
-        content: "How VibeConnect protects private conversations, in plain language.",
-      },
+      { property: "og:description", content: "Privacy as a technical property, not a marketing claim." },
     ],
   }),
   component: Privacy,
 });
 
-const devices = [
-  { name: "Pixel 9 · this device", icon: Smartphone, since: "Active now", verified: true },
-  { name: "MacBook Air", icon: Laptop, since: "Last active 2h ago", verified: true },
-  { name: "iPad mini", icon: Tablet, since: "Last active 6 days ago", verified: false },
-];
-
-const permissions = [
-  { label: "Who can message me", value: "People I follow" },
-  { label: "Who can add me to groups", value: "My contacts" },
-  { label: "Who can follow me", value: "Everyone" },
-  { label: "Who can comment", value: "Subscribers" },
-  { label: "Who can mention me", value: "People I follow" },
-  { label: "Who can see my activity", value: "Nobody" },
-];
+const prefKeys = [
+  { key: "likes", label: "Likes on your posts" },
+  { key: "comments", label: "Comments on your posts" },
+  { key: "subscriptions", label: "New subscribers" },
+  { key: "messages", label: "Incoming encrypted messages" },
+  { key: "show_previews", label: "Show sender name in message alerts" },
+] as const;
 
 function Privacy() {
+  const { user, deviceId } = useAuth();
+  const devices = useMyDevices();
+  const { prefs, update } = useNotificationPrefs();
+
   return (
-    <div className="space-y-8 px-4 py-5">
-      <section className="surface-card gradient-dusk p-5">
-        <ShieldCheck className="size-6 text-secure" />
-        <h1 className="mt-3 font-display text-2xl">Privacy Centre</h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Your private messages are encrypted on your device and decrypted only on authorised
-          recipient devices. Public videos and photos are protected in transit and at rest, but they
-          are not end-to-end encrypted — that's how discovery works.
+    <div className="space-y-6 px-4 py-5">
+      <div>
+        <h1 className="font-display text-2xl">Privacy Centre</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          What is encrypted, what is public, and which devices can read your chats.
         </p>
-      </section>
+      </div>
 
-      <section>
-        <SectionHeading title="Devices" />
-        <ul className="divide-y divide-border overflow-hidden rounded-xl bg-surface">
-          {devices.map((d) => (
-            <li key={d.name} className="flex items-center gap-3 p-3">
-              <span className="grid size-9 place-items-center rounded-lg bg-secondary text-foreground">
-                <d.icon className="size-4" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{d.name}</p>
-                <p className="text-xs text-muted-foreground">{d.since}</p>
-              </div>
-              <span
-                className={
-                  "rounded-full px-2 py-0.5 text-[11px] " +
-                  (d.verified ? "bg-secure/12 text-secure" : "bg-secondary text-muted-foreground")
-                }
-              >
-                {d.verified ? "Verified" : "Verify"}
-              </span>
-            </li>
-          ))}
-        </ul>
-        <button className="mt-3 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-xs font-medium">
-          <KeyRound className="size-4 text-primary" /> View security code
-        </button>
-      </section>
-
-      <section>
-        <SectionHeading title="Permissions" />
-        <ul className="divide-y divide-border overflow-hidden rounded-xl bg-surface">
-          {permissions.map((p) => (
-            <li key={p.label} className="flex items-center justify-between gap-3 p-3">
-              <span className="text-sm">{p.label}</span>
-              <span className="text-xs text-muted-foreground">{p.value}</span>
-            </li>
-          ))}
+      <section className="surface-card p-4">
+        <h2 className="flex items-center gap-2 font-display text-base">
+          <ShieldCheck className="size-4 text-secure" /> How your data is protected
+        </h2>
+        <ul className="mt-3 space-y-3 text-sm">
+          <li className="flex gap-2">
+            <Lock className="mt-0.5 size-4 shrink-0 text-secure" />
+            <span>
+              <strong>Private chats</strong> are end-to-end encrypted with per-device ECDH keys and AES-256-GCM.
+              Your private key never leaves this browser, and the server only stores ciphertext.
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <Globe className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+            <span>
+              <strong>Public posts</strong> are encrypted in transit and at rest and served through signed CDN URLs —
+              but they are discoverable, so they are <em>not</em> end-to-end encrypted.
+            </span>
+          </li>
         </ul>
       </section>
 
-      <section>
-        <SectionHeading title="Your data" />
-        <div className="grid gap-2">
-          <Row icon={Ban} label="Blocked accounts" note="3 accounts" />
-          <Row icon={Download} label="Download your data" note="Public content & metadata" />
-          <Row icon={Trash2} label="Delete account" note="Permanent" danger />
+      {!user ? (
+        <div className="rounded-xl border border-dashed border-border p-8 text-center">
+          <p className="text-sm font-medium">Sign in to manage devices</p>
+          <Link
+            to="/auth"
+            search={{ next: "/privacy" }}
+            className="mt-4 inline-block rounded-full gradient-marigold px-4 py-2 text-xs font-medium text-primary-foreground"
+          >
+            Sign in
+          </Link>
         </div>
-      </section>
+      ) : (
+        <>
+          <section>
+            <h2 className="mb-3 font-display text-lg">Your devices</h2>
+            <ul className="divide-y divide-border overflow-hidden rounded-xl bg-surface">
+              {(devices.data ?? []).map((d) => (
+                <li key={d.id} className="flex items-start gap-3 p-3">
+                  <Smartphone className="mt-0.5 size-4 text-muted-foreground" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">
+                      {d.label}
+                      {d.id === deviceId && <span className="ml-2 text-[11px] text-secure">This device</span>}
+                    </p>
+                    <p className="mt-0.5 break-all font-mono text-[11px] text-muted-foreground">
+                      Safety number {d.safety_number}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      Last seen {d.last_seen_at ? timeAgo(d.last_seen_at) : timeAgo(d.created_at)}
+                    </p>
+                  </div>
+                </li>
+              ))}
+              {(devices.data ?? []).length === 0 && (
+                <li className="p-6 text-center text-sm text-muted-foreground">
+                  Registering this device's encryption keys…
+                </li>
+              )}
+            </ul>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Compare safety numbers with a contact out of band to verify there is no one in the middle.
+            </p>
+          </section>
 
-      <p className="pb-4 text-[11px] leading-relaxed text-muted-foreground">
-        VibeConnect avoids marketing language about encryption. Before launch, the cryptographic
-        design should be documented and reviewed by an independent security auditor.
-      </p>
+          <section>
+            <h2 className="mb-3 font-display text-lg">Notifications</h2>
+            <ul className="divide-y divide-border overflow-hidden rounded-xl bg-surface">
+              {prefKeys.map(({ key, label }) => {
+                const on = prefs ? (prefs[key] as boolean) : true;
+                return (
+                  <li key={key} className="flex items-center justify-between gap-3 p-3">
+                    <span className="text-sm">{label}</span>
+                    <button
+                      role="switch"
+                      aria-checked={on}
+                      aria-label={label}
+                      onClick={() => update.mutate({ [key]: !on })}
+                      className={
+                        "relative h-6 w-11 shrink-0 rounded-full transition-colors " +
+                        (on ? "bg-primary" : "bg-secondary")
+                      }
+                    >
+                      <span
+                        className={
+                          "absolute top-0.5 size-5 rounded-full bg-background transition-all " +
+                          (on ? "left-[22px]" : "left-0.5")
+                        }
+                      />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Message notifications never contain message text — the server cannot read it.
+            </p>
+          </section>
+        </>
+      )}
     </div>
-  );
-}
-
-function Row({
-  icon: Icon,
-  label,
-  note,
-  danger,
-}: {
-  icon: typeof Ban;
-  label: string;
-  note: string;
-  danger?: boolean;
-}) {
-  return (
-    <button className="flex items-center gap-3 rounded-xl bg-surface p-3 text-left">
-      <Icon className={"size-4 " + (danger ? "text-destructive" : "text-muted-foreground")} />
-      <span className="flex-1 text-sm">{label}</span>
-      <span className="text-xs text-muted-foreground">{note}</span>
-    </button>
   );
 }

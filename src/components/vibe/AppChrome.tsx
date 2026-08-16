@@ -11,7 +11,7 @@ import {
   Image,
   Video,
   Clapperboard,
-  Radio,
+  Bell,
   PenLine,
   X,
 } from "lucide-react";
@@ -25,12 +25,11 @@ const tabs = [
 ] as const;
 
 const createOptions = [
-  { label: "Upload Photo", icon: Image, note: "Public, followers or encrypted" },
-  { label: "Upload Video", icon: Video, note: "Long-form, up to 4K" },
-  { label: "Create Short", icon: Clapperboard, note: "Vertical, under 60s" },
-  { label: "Go Live", icon: Radio, note: "Public broadcast" },
-  { label: "Create Post", icon: PenLine, note: "Text & links for your community" },
-];
+  { label: "Upload Photo", icon: Image, note: "Public post with CDN delivery", to: "/upload" },
+  { label: "Upload Video", icon: Video, note: "Long-form with auto thumbnail", to: "/upload" },
+  { label: "Create Short", icon: Clapperboard, note: "Vertical, under 90s", to: "/upload" },
+  { label: "Encrypted message", icon: PenLine, note: "Private, end-to-end encrypted", to: "/messages" },
+] as const;
 
 export function TopBar() {
   return (
@@ -49,6 +48,13 @@ export function TopBar() {
             aria-label="Search"
           >
             <Search className="size-5" />
+          </Link>
+          <Link
+            to="/notifications"
+            className="grid size-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            aria-label="Notifications"
+          >
+            <Bell className="size-5" />
           </Link>
           <Link
             to="/privacy"
@@ -91,7 +97,8 @@ export function BottomNav() {
               <ul>
                 {createOptions.map((o) => (
                   <li key={o.label}>
-                    <button
+                    <Link
+                      to={o.to}
                       onClick={() => setSheetOpen(false)}
                       className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-secondary"
                     >
@@ -102,7 +109,7 @@ export function BottomNav() {
                         <span className="block text-sm font-medium">{o.label}</span>
                         <span className="block text-xs text-muted-foreground">{o.note}</span>
                       </span>
-                    </button>
+                    </Link>
                   </li>
                 ))}
               </ul>

@@ -13,9 +13,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as MessagesRouteImport } from './routes/messages'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ShortsRouteImport } from './routes/shorts'
+import { Route as UploadRouteImport } from './routes/upload'
 import { Route as ChatChatIdRouteImport } from './routes/chat.$chatId'
 import { Route as PostPostIdRouteImport } from './routes/post.$postId'
 import { Route as UHandleRouteImport } from './routes/u.$handle'
@@ -40,6 +42,11 @@ const MessagesRoute = MessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -53,6 +60,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const ShortsRoute = ShortsRouteImport.update({
   id: '/shorts',
   path: '/shorts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UploadRoute = UploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChatChatIdRoute = ChatChatIdRouteImport.update({
@@ -76,9 +88,11 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/messages': typeof MessagesRoute
+  '/notifications': typeof NotificationsRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
+  '/upload': typeof UploadRoute
   '/chat/$chatId': typeof ChatChatIdRoute
   '/post/$postId': typeof PostPostIdRoute
   '/u/$handle': typeof UHandleRoute
@@ -88,9 +102,11 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/messages': typeof MessagesRoute
+  '/notifications': typeof NotificationsRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
+  '/upload': typeof UploadRoute
   '/chat/$chatId': typeof ChatChatIdRoute
   '/post/$postId': typeof PostPostIdRoute
   '/u/$handle': typeof UHandleRoute
@@ -101,9 +117,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/messages': typeof MessagesRoute
+  '/notifications': typeof NotificationsRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
+  '/upload': typeof UploadRoute
   '/chat/$chatId': typeof ChatChatIdRoute
   '/post/$postId': typeof PostPostIdRoute
   '/u/$handle': typeof UHandleRoute
@@ -115,9 +133,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/explore'
     | '/messages'
+    | '/notifications'
     | '/privacy'
     | '/profile'
     | '/shorts'
+    | '/upload'
     | '/chat/$chatId'
     | '/post/$postId'
     | '/u/$handle'
@@ -127,9 +147,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/explore'
     | '/messages'
+    | '/notifications'
     | '/privacy'
     | '/profile'
     | '/shorts'
+    | '/upload'
     | '/chat/$chatId'
     | '/post/$postId'
     | '/u/$handle'
@@ -139,9 +161,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/explore'
     | '/messages'
+    | '/notifications'
     | '/privacy'
     | '/profile'
     | '/shorts'
+    | '/upload'
     | '/chat/$chatId'
     | '/post/$postId'
     | '/u/$handle'
@@ -152,9 +176,11 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ExploreRoute: typeof ExploreRoute
   MessagesRoute: typeof MessagesRoute
+  NotificationsRoute: typeof NotificationsRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ShortsRoute: typeof ShortsRoute
+  UploadRoute: typeof UploadRoute
   ChatChatIdRoute: typeof ChatChatIdRoute
   PostPostIdRoute: typeof PostPostIdRoute
   UHandleRoute: typeof UHandleRoute
@@ -190,6 +216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -209,6 +242,13 @@ declare module '@tanstack/react-router' {
       path: '/shorts'
       fullPath: '/shorts'
       preLoaderRoute: typeof ShortsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/upload': {
+      id: '/upload'
+      path: '/upload'
+      fullPath: '/upload'
+      preLoaderRoute: typeof UploadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chat/$chatId': {
@@ -240,9 +280,11 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ExploreRoute: ExploreRoute,
   MessagesRoute: MessagesRoute,
+  NotificationsRoute: NotificationsRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ShortsRoute: ShortsRoute,
+  UploadRoute: UploadRoute,
   ChatChatIdRoute: ChatChatIdRoute,
   PostPostIdRoute: PostPostIdRoute,
   UHandleRoute: UHandleRoute,

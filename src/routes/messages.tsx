@@ -1,8 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search, Users, Lock, ShieldCheck } from "lucide-react";
+import { Search, Lock, ShieldCheck, PenSquare } from "lucide-react";
 import { Monogram, EncryptedBadge } from "@/components/vibe/primitives";
-import { threads } from "@/lib/mock-data";
+import { useConversations, useStartConversation } from "@/lib/messaging";
+import { usePeopleSearch } from "@/lib/data";
+import { useAuth } from "@/lib/auth";
+import { timeAgo } from "@/lib/media";
 
 export const Route = createFileRoute("/messages")({
   head: () => ({
@@ -10,7 +13,7 @@ export const Route = createFileRoute("/messages")({
       { title: "Messages — VibeConnect" },
       {
         name: "description",
-        content: "End-to-end encrypted one-to-one and group conversations on VibeConnect.",
+        content: "End-to-end encrypted one-to-one conversations on VibeConnect.",
       },
       { property: "og:title", content: "Messages — VibeConnect" },
       { property: "og:description", content: "Private conversations, encrypted on your device." },
@@ -19,90 +22,121 @@ export const Route = createFileRoute("/messages")({
   component: Messages,
 });
 
-const filters = ["Chats", "Groups", "Communities"] as const;
-
 function Messages() {
-  const [filter, setFilter] = useState<(typeof filters)[number]>("Chats");
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const conversations = useConversations();
   const [query, setQuery] = useState("");
+  const [composing, setComposing] = useState(false);
+  const people = usePeopleSearch(query);
+  const start = useStartConversation();
 
-  const list = threads
-    .filter((t) => (filter === "Groups" ? t.kind === "group" : true))
-    .filter((t) => t.name.toLowerCase().includes(query.toLowerCase()));
+  if (!user) {
+    return (
+      <div className="px-4 py-10 text-center">
+        <h1 className="font-display text-xl">Sign in for encrypted chats</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Your device generates its own keys — the server only ever stores ciphertext.
+        </p>
+        <Link
+          to="/auth"
+          search={{ next: "/messages" }}
+          className="mt-5 inline-block rounded-full gradient-marigold px-5 py-2 text-sm font-medium text-primary-foreground"
+        >
+          Sign in
+        </Link>
+      </div>
+    );
+  }
+
+  const list = (conversations.data ?? []).filter((c) =>
+    composing
+      ? true
+      : (c.other?.display_name ?? "").toLowerCase().includes(query.toLowerCase()) ||
+        (c.other?.handle ?? "").toLowerCase().includes(query.toLowerCase()),
+  );
 
   return (
     <div className="px-4 py-5">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="font-display text-2xl">Messages</h1>
-        <EncryptedBadge compact />
+        <div className="flex items-center gap-2">
+          <EncryptedBadge compact />
+          <button
+            onClick={() => setComposing((v) => !v)}
+            className="grid size-9 place-items-center rounded-full bg-secondary"
+            aria-label="New chat"
+          >
+            <PenSquare className="size-4" />
+          </button>
+        </div>
       </div>
 
-      <label className="relative mb-3 block">
+      <label className="relative mb-4 block">
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search conversations on this device"
+          placeholder={composing ? "Search people by name or handle" : "Search conversations on this device"}
           className="w-full rounded-full border border-border bg-surface py-3 pl-10 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/60"
         />
       </label>
 
-      <div className="mb-4 flex gap-2">
-        {filters.map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={
-              "rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors " +
-              (filter === f
-                ? "gradient-marigold text-primary-foreground"
-                : "bg-secondary text-secondary-foreground")
-            }
-          >
-            {f}
-          </button>
-        ))}
-      </div>
-
-      {filter === "Communities" ? (
+      {composing ? (
+        <ul className="divide-y divide-border overflow-hidden rounded-xl bg-surface">
+          {(people.data ?? [])
+            .filter((p) => p.id !== user.id)
+            .map((p) => (
+              <li key={p.id}>
+                <button
+                  onClick={() =>
+                    start.mutate(p.id, {
+                      onSuccess: (chatId) => void navigate({ to: "/chat/$chatId", params: { chatId } }),
+                    })
+                  }
+                  className="flex w-full items-center gap-3 p-3 text-left hover:bg-secondary/60"
+                >
+                  <Monogram name={p.display_name || p.handle} hue={p.hue} size={42} />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-medium">{p.display_name || p.handle}</span>
+                    <span className="block truncate text-xs text-muted-foreground">@{p.handle}</span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          {(people.data ?? []).length === 0 && (
+            <li className="p-6 text-center text-sm text-muted-foreground">No people found.</li>
+          )}
+        </ul>
+      ) : conversations.isLoading ? (
+        <div className="h-40 animate-pulse rounded-xl bg-surface-2" />
+      ) : list.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-8 text-center">
-          <Users className="mx-auto mb-2 size-6 text-muted-foreground" />
-          <p className="text-sm font-medium">No community chats yet</p>
+          <p className="text-sm font-medium">No conversations yet</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Join a community from Explore to start talking.
+            Start an encrypted chat with someone you follow.
           </p>
-          <Link
-            to="/explore"
-            className="mt-4 inline-block rounded-full gradient-marigold px-4 py-2 text-xs font-medium text-primary-foreground"
+          <button
+            onClick={() => setComposing(true)}
+            className="mt-4 rounded-full gradient-marigold px-4 py-2 text-xs font-medium text-primary-foreground"
           >
-            Browse communities
-          </Link>
+            New chat
+          </button>
         </div>
       ) : (
         <ul className="divide-y divide-border overflow-hidden rounded-xl bg-surface">
-          {list.map((t) => (
-            <li key={t.id}>
-              <Link to="/chat/$chatId" params={{ chatId: t.id }} className="flex items-center gap-3 p-3">
-                <Monogram name={t.name} hue={t.hue} size={46} />
+          {list.map((c) => (
+            <li key={c.id}>
+              <Link to="/chat/$chatId" params={{ chatId: c.id }} className="flex items-center gap-3 p-3">
+                <Monogram name={c.other?.display_name || c.other?.handle || "V"} hue={c.other?.hue ?? 42} size={46} />
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="truncate text-sm font-medium">{t.name}</p>
-                    {t.kind === "group" && (
-                      <span className="text-[11px] text-muted-foreground">· {t.members}</span>
-                    )}
-                  </div>
+                  <p className="truncate text-sm font-medium">{c.other?.display_name || c.other?.handle}</p>
                   <p className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-muted-foreground">
                     <Lock className="size-3 shrink-0 text-secure" />
-                    {t.preview}
+                    Encrypted message
                   </p>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  <span className="text-[11px] text-muted-foreground">{t.time}</span>
-                  {t.unread > 0 && (
-                    <span className="grid min-w-5 place-items-center rounded-full bg-primary px-1.5 text-[11px] font-medium text-primary-foreground">
-                      {t.unread}
-                    </span>
-                  )}
-                </div>
+                <span className="text-[11px] text-muted-foreground">{timeAgo(c.last_message_at)}</span>
               </Link>
             </li>
           ))}
@@ -111,7 +145,7 @@ function Messages() {
 
       <p className="mt-4 flex items-start gap-2 rounded-xl bg-secure/8 p-3 text-[11px] leading-relaxed text-muted-foreground">
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-secure" />
-        Message previews are intentionally generic. Conversation search runs on this device only —
+        Message previews are intentionally generic. Conversation content is decrypted on this device only —
         the server never holds readable message text.
       </p>
     </div>
