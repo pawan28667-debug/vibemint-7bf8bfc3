@@ -44,6 +44,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "comments_user_profile_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       conversations: {
@@ -250,6 +257,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "notifications_actor_profile_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "notifications_conversation_id_fkey"
             columns: ["conversation_id"]
             isOneToOne: false
@@ -317,7 +331,15 @@ export type Database = {
           visibility?: string
           width?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_author_profile_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
