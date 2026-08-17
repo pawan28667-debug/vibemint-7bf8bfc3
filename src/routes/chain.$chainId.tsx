@@ -83,8 +83,8 @@ function ChainPage() {
   const [resultDraft, setResultDraft] = useState("");
 
   const tree = useMemo(() => buildChainTree(nodes ?? []), [nodes]);
-  const topNode = useMemo(
-    () => (nodes ?? []).reduce<null | (typeof nodes)[number]>((best, n) => (!best || n.vote_count > best.vote_count ? n : best), null),
+  const topNode = useMemo<ChainNode | null>(
+    () => (nodes ?? []).reduce<ChainNode | null>((best, n) => (!best || n.vote_count > best.vote_count ? n : best), null),
     [nodes],
   );
   const isOwner = !!user && !!chain && chain.starter_id === user.id;

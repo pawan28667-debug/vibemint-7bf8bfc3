@@ -19,6 +19,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as UploadRouteImport } from './routes/upload'
+import { Route as ChainChainIdRouteImport } from './routes/chain.$chainId'
 import { Route as ChainsNewRouteImport } from './routes/chains.new'
 import { Route as ChatChatIdRouteImport } from './routes/chat.$chatId'
 import { Route as PostPostIdRouteImport } from './routes/post.$postId'
@@ -74,6 +75,11 @@ const UploadRoute = UploadRouteImport.update({
   path: '/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChainChainIdRoute = ChainChainIdRouteImport.update({
+  id: '/chain/$chainId',
+  path: '/chain/$chainId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChainsNewRoute = ChainsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
   '/upload': typeof UploadRoute
+  '/chain/$chainId': typeof ChainChainIdRoute
   '/chains/new': typeof ChainsNewRoute
   '/chat/$chatId': typeof ChatChatIdRoute
   '/post/$postId': typeof PostPostIdRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
   '/upload': typeof UploadRoute
+  '/chain/$chainId': typeof ChainChainIdRoute
   '/chains/new': typeof ChainsNewRoute
   '/chat/$chatId': typeof ChatChatIdRoute
   '/post/$postId': typeof PostPostIdRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
   '/upload': typeof UploadRoute
+  '/chain/$chainId': typeof ChainChainIdRoute
   '/chains/new': typeof ChainsNewRoute
   '/chat/$chatId': typeof ChatChatIdRoute
   '/post/$postId': typeof PostPostIdRoute
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/upload'
+    | '/chain/$chainId'
     | '/chains/new'
     | '/chat/$chatId'
     | '/post/$postId'
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/upload'
+    | '/chain/$chainId'
     | '/chains/new'
     | '/chat/$chatId'
     | '/post/$postId'
@@ -189,6 +200,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/upload'
+    | '/chain/$chainId'
     | '/chains/new'
     | '/chat/$chatId'
     | '/post/$postId'
@@ -206,6 +218,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ShortsRoute: typeof ShortsRoute
   UploadRoute: typeof UploadRoute
+  ChainChainIdRoute: typeof ChainChainIdRoute
   ChatChatIdRoute: typeof ChatChatIdRoute
   PostPostIdRoute: typeof PostPostIdRoute
   UHandleRoute: typeof UHandleRoute
@@ -283,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UploadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chain/$chainId': {
+      id: '/chain/$chainId'
+      path: '/chain/$chainId'
+      fullPath: '/chain/$chainId'
+      preLoaderRoute: typeof ChainChainIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chains/new': {
       id: '/chains/new'
       path: '/new'
@@ -336,6 +356,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ShortsRoute: ShortsRoute,
   UploadRoute: UploadRoute,
+  ChainChainIdRoute: ChainChainIdRoute,
   ChatChatIdRoute: ChatChatIdRoute,
   PostPostIdRoute: PostPostIdRoute,
   UHandleRoute: UHandleRoute,
