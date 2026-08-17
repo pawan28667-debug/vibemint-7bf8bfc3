@@ -32,6 +32,7 @@ import {
   useToggleChainVote,
   useUpdateChain,
   type ContributionType,
+  type ChainNode,
 } from "@/lib/chains";
 
 export const Route = createFileRoute("/chain/$chainId")({
