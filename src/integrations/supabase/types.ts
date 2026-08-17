@@ -284,6 +284,7 @@ export type Database = {
           author_id: string
           caption: string
           category: string
+          chain_id: string | null
           comment_count: number
           created_at: string
           duration_seconds: number | null
@@ -301,6 +302,7 @@ export type Database = {
           author_id: string
           caption?: string
           category?: string
+          chain_id?: string | null
           comment_count?: number
           created_at?: string
           duration_seconds?: number | null
@@ -318,6 +320,7 @@ export type Database = {
           author_id?: string
           caption?: string
           category?: string
+          chain_id?: string | null
           comment_count?: number
           created_at?: string
           duration_seconds?: number | null
@@ -337,6 +340,13 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_chain_id_fkey"
+            columns: ["chain_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_chains"
             referencedColumns: ["id"]
           },
         ]
@@ -389,11 +399,380 @@ export type Database = {
         }
         Relationships: []
       }
+      vibe_chain_messages: {
+        Row: {
+          body: string
+          chain_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          chain_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          chain_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vcm_user_profile_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vibe_chain_messages_chain_id_fkey"
+            columns: ["chain_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_chains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vibe_chain_nodes: {
+        Row: {
+          author_id: string
+          body: string
+          chain_id: string
+          contribution: Database["public"]["Enums"]["contribution_type"]
+          created_at: string
+          id: string
+          is_pinned: boolean
+          link_url: string | null
+          merged_from_node_id: string | null
+          moderation_status: string
+          original_author_id: string | null
+          parent_id: string | null
+          post_id: string | null
+          remix_of_node_id: string | null
+          updated_at: string
+          vote_count: number
+        }
+        Insert: {
+          author_id: string
+          body?: string
+          chain_id: string
+          contribution?: Database["public"]["Enums"]["contribution_type"]
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          link_url?: string | null
+          merged_from_node_id?: string | null
+          moderation_status?: string
+          original_author_id?: string | null
+          parent_id?: string | null
+          post_id?: string | null
+          remix_of_node_id?: string | null
+          updated_at?: string
+          vote_count?: number
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          chain_id?: string
+          contribution?: Database["public"]["Enums"]["contribution_type"]
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          link_url?: string | null
+          merged_from_node_id?: string | null
+          moderation_status?: string
+          original_author_id?: string | null
+          parent_id?: string | null
+          post_id?: string | null
+          remix_of_node_id?: string | null
+          updated_at?: string
+          vote_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vcn_author_profile_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vibe_chain_nodes_chain_id_fkey"
+            columns: ["chain_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_chains"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vibe_chain_nodes_merged_from_node_id_fkey"
+            columns: ["merged_from_node_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_chain_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vibe_chain_nodes_original_author_id_fkey"
+            columns: ["original_author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vibe_chain_nodes_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_chain_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vibe_chain_nodes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vibe_chain_nodes_remix_of_node_id_fkey"
+            columns: ["remix_of_node_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_chain_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vibe_chain_participants: {
+        Row: {
+          chain_id: string
+          joined_at: string
+          role: Database["public"]["Enums"]["chain_role"]
+          user_id: string
+        }
+        Insert: {
+          chain_id: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["chain_role"]
+          user_id: string
+        }
+        Update: {
+          chain_id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["chain_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vcp_user_profile_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vibe_chain_participants_chain_id_fkey"
+            columns: ["chain_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_chains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vibe_chain_tasks: {
+        Row: {
+          assignee_id: string | null
+          chain_id: string
+          created_at: string
+          created_by: string
+          done: boolean
+          due_date: string | null
+          id: string
+          title: string
+        }
+        Insert: {
+          assignee_id?: string | null
+          chain_id: string
+          created_at?: string
+          created_by: string
+          done?: boolean
+          due_date?: string | null
+          id?: string
+          title: string
+        }
+        Update: {
+          assignee_id?: string | null
+          chain_id?: string
+          created_at?: string
+          created_by?: string
+          done?: boolean
+          due_date?: string | null
+          id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vibe_chain_tasks_assignee_id_fkey"
+            columns: ["assignee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vibe_chain_tasks_chain_id_fkey"
+            columns: ["chain_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_chains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vibe_chain_votes: {
+        Row: {
+          chain_id: string
+          created_at: string
+          node_id: string
+          user_id: string
+        }
+        Insert: {
+          chain_id: string
+          created_at?: string
+          node_id: string
+          user_id: string
+        }
+        Update: {
+          chain_id?: string
+          created_at?: string
+          node_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vibe_chain_votes_chain_id_fkey"
+            columns: ["chain_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_chains"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vibe_chain_votes_node_id_fkey"
+            columns: ["node_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_chain_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vibe_chains: {
+        Row: {
+          category: string
+          completed_at: string | null
+          created_at: string
+          deadline: string | null
+          description: string
+          id: string
+          last_activity_at: string
+          node_count: number
+          participant_count: number
+          result_summary: string
+          root_post_id: string | null
+          rules: string
+          starter_id: string
+          status: Database["public"]["Enums"]["chain_status"]
+          tags: string[]
+          title: string
+          type: Database["public"]["Enums"]["chain_type"]
+          updated_at: string
+          visibility: Database["public"]["Enums"]["chain_visibility"]
+          vote_count: number
+          voting_open: boolean
+        }
+        Insert: {
+          category?: string
+          completed_at?: string | null
+          created_at?: string
+          deadline?: string | null
+          description?: string
+          id?: string
+          last_activity_at?: string
+          node_count?: number
+          participant_count?: number
+          result_summary?: string
+          root_post_id?: string | null
+          rules?: string
+          starter_id: string
+          status?: Database["public"]["Enums"]["chain_status"]
+          tags?: string[]
+          title: string
+          type?: Database["public"]["Enums"]["chain_type"]
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["chain_visibility"]
+          vote_count?: number
+          voting_open?: boolean
+        }
+        Update: {
+          category?: string
+          completed_at?: string | null
+          created_at?: string
+          deadline?: string | null
+          description?: string
+          id?: string
+          last_activity_at?: string
+          node_count?: number
+          participant_count?: number
+          result_summary?: string
+          root_post_id?: string | null
+          rules?: string
+          starter_id?: string
+          status?: Database["public"]["Enums"]["chain_status"]
+          tags?: string[]
+          title?: string
+          type?: Database["public"]["Enums"]["chain_type"]
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["chain_visibility"]
+          vote_count?: number
+          voting_open?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vibe_chains_root_post_id_fkey"
+            columns: ["root_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vibe_chains_starter_profile_fkey"
+            columns: ["starter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      can_contribute_chain: {
+        Args: { _chain_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_chain: {
+        Args: { _chain_id: string; _user_id: string }
+        Returns: boolean
+      }
+      chain_role_of: {
+        Args: { _chain_id: string; _user_id: string }
+        Returns: Database["public"]["Enums"]["chain_role"]
+      }
+      is_chain_participant: {
+        Args: { _chain_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_conversation_member: {
         Args: { _conversation_id: string; _user_id: string }
         Returns: boolean
@@ -410,7 +789,27 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      chain_role: "owner" | "moderator" | "editor" | "contributor"
+      chain_status: "active" | "voting" | "building" | "complete" | "archived"
+      chain_type:
+        | "discussion"
+        | "challenge"
+        | "collaboration"
+        | "remix"
+        | "question"
+        | "project"
+        | "idea"
+        | "open"
+      chain_visibility: "public" | "followers" | "invite" | "private"
+      contribution_type:
+        | "response"
+        | "remix"
+        | "idea"
+        | "improvement"
+        | "question"
+        | "design"
+        | "collaboration"
+        | "result"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -537,6 +936,30 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      chain_role: ["owner", "moderator", "editor", "contributor"],
+      chain_status: ["active", "voting", "building", "complete", "archived"],
+      chain_type: [
+        "discussion",
+        "challenge",
+        "collaboration",
+        "remix",
+        "question",
+        "project",
+        "idea",
+        "open",
+      ],
+      chain_visibility: ["public", "followers", "invite", "private"],
+      contribution_type: [
+        "response",
+        "remix",
+        "idea",
+        "improvement",
+        "question",
+        "design",
+        "collaboration",
+        "result",
+      ],
+    },
   },
 } as const
