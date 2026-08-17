@@ -19,6 +19,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as UploadRouteImport } from './routes/upload'
+import { Route as ChainsNewRouteImport } from './routes/chains.new'
 import { Route as ChatChatIdRouteImport } from './routes/chat.$chatId'
 import { Route as PostPostIdRouteImport } from './routes/post.$postId'
 import { Route as UHandleRouteImport } from './routes/u.$handle'
@@ -73,6 +74,11 @@ const UploadRoute = UploadRouteImport.update({
   path: '/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChainsNewRoute = ChainsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => ChainsRoute,
+} as any)
 const ChatChatIdRoute = ChatChatIdRouteImport.update({
   id: '/chat/$chatId',
   path: '/chat/$chatId',
@@ -92,7 +98,7 @@ const UHandleRoute = UHandleRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/chains': typeof ChainsRoute
+  '/chains': typeof ChainsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/messages': typeof MessagesRoute
   '/notifications': typeof NotificationsRoute
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
   '/upload': typeof UploadRoute
+  '/chains/new': typeof ChainsNewRoute
   '/chat/$chatId': typeof ChatChatIdRoute
   '/post/$postId': typeof PostPostIdRoute
   '/u/$handle': typeof UHandleRoute
@@ -107,7 +114,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/chains': typeof ChainsRoute
+  '/chains': typeof ChainsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/messages': typeof MessagesRoute
   '/notifications': typeof NotificationsRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
   '/upload': typeof UploadRoute
+  '/chains/new': typeof ChainsNewRoute
   '/chat/$chatId': typeof ChatChatIdRoute
   '/post/$postId': typeof PostPostIdRoute
   '/u/$handle': typeof UHandleRoute
@@ -123,7 +131,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/chains': typeof ChainsRoute
+  '/chains': typeof ChainsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/messages': typeof MessagesRoute
   '/notifications': typeof NotificationsRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/shorts': typeof ShortsRoute
   '/upload': typeof UploadRoute
+  '/chains/new': typeof ChainsNewRoute
   '/chat/$chatId': typeof ChatChatIdRoute
   '/post/$postId': typeof PostPostIdRoute
   '/u/$handle': typeof UHandleRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/upload'
+    | '/chains/new'
     | '/chat/$chatId'
     | '/post/$postId'
     | '/u/$handle'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/upload'
+    | '/chains/new'
     | '/chat/$chatId'
     | '/post/$postId'
     | '/u/$handle'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/shorts'
     | '/upload'
+    | '/chains/new'
     | '/chat/$chatId'
     | '/post/$postId'
     | '/u/$handle'
@@ -186,7 +198,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
-  ChainsRoute: typeof ChainsRoute
+  ChainsRoute: typeof ChainsRouteWithChildren
   ExploreRoute: typeof ExploreRoute
   MessagesRoute: typeof MessagesRoute
   NotificationsRoute: typeof NotificationsRoute
@@ -271,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UploadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chains/new': {
+      id: '/chains/new'
+      path: '/new'
+      fullPath: '/chains/new'
+      preLoaderRoute: typeof ChainsNewRouteImport
+      parentRoute: typeof ChainsRoute
+    }
     '/chat/$chatId': {
       id: '/chat/$chatId'
       path: '/chat/$chatId'
@@ -295,10 +314,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ChainsRouteChildren {
+  ChainsNewRoute: typeof ChainsNewRoute
+}
+
+const ChainsRouteChildren: ChainsRouteChildren = {
+  ChainsNewRoute: ChainsNewRoute,
+}
+
+const ChainsRouteWithChildren =
+  ChainsRoute._addFileChildren(ChainsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
-  ChainsRoute: ChainsRoute,
+  ChainsRoute: ChainsRouteWithChildren,
   ExploreRoute: ExploreRoute,
   MessagesRoute: MessagesRoute,
   NotificationsRoute: NotificationsRoute,
