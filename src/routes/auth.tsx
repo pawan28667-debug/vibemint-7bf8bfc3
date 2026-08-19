@@ -71,17 +71,25 @@ function AuthPage() {
     }
   }
 
-  async function google() {
+  async function magicLink() {
     setStatus(null);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      setStatus("Google sign-in failed. Try again.");
+    if (!email) {
+      setStatus("Enter your email first, then request a link.");
       return;
     }
-    if (result.redirected) return;
-    void navigate({ to: safeNext(next), replace: true });
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      if (error) throw error;
+      setStatus("Sign-in link sent — check your inbox.");
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : "Could not send the link");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
